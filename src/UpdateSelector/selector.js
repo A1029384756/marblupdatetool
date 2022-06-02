@@ -19,7 +19,7 @@ function Selector(props) {
         <>
             <select className='select' id='firmwareVersion' onChange={handleChange} defaultValue={'Select a Version'}>
                 {firmwareList.map((version) => <option key={version.name} value={version.data.link}>{version.name}</option>)}
-                <option value={'custom_version'}>Custom</option>
+                <option value={'invalid'}>Select Firmware</option>
             </select>
         </>
     )

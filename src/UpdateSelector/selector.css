@@ -2,4 +2,20 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 10px;
+    font-size: 16px;
+}
+
+.select {
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 4px;
+    background-color: white;
+    color: #2d3436;
+    transition-duration: 0.4s;
+}
+
+.select:hover {
+    background-color: #eff3f5;
+    transition-duration: 0.4s;
 }

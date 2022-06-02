@@ -1,12 +1,11 @@
 'use strict';
 
-import { CryptoJS, mosi_mask, miso_mask, a_flash_freq, a_flash_size, MD5, enc } from 'crypto-js'
+import { mosi_mask, miso_mask, a_flash_freq, a_flash_size, MD5, enc } from 'crypto-js'
 import { inflate, deflate } from 'pako'
 
 class ESP8266ROM {
     static CHIP_NAME = "ESP8266";
     static CHIP_DETECT_MAGIC_VALUE = 0xfff0c101;
-    static BOOTLOADER_FLASH_OFFSET = 0x1000;
 }
 
 class ESP32ROM {
@@ -1284,8 +1283,8 @@ class ESPLoader {
         if (image.length < 8) {
             return image;
         }
-        //this.chip.BOOTLOADER_FLASH_OFFSET
-        if (address != 0x1000) {
+        
+        if (address != this.chip.BOOTLOADER_FLASH_OFFSET) {
             return image;
         }
         if (flash_size === 'keep' && flash_mode === 'keep' && flash_freq === 'keep') {

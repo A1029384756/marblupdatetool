@@ -22,20 +22,30 @@ function App() {
   }
 
   const downloadFirmware = async () => {
-    fetch(selectedFirmware).then((response) => {
-      response.blob().then((blob) => {
-        var zip = require('jszip')()
-        zip.loadAsync(blob).then((zip) => {
-          Object.keys(zip.files).forEach((filename) => {
-            zip.files[filename].async('text').then((fileData) => {
-              if (fileData !== "") {
-                firmwareArr.push(fileData)
-              }
-            })
-          })
-        })
-      })
-    })
+    firmwareArr = []
+    // fetch(selectedFirmware).then((response) => {
+    //   response.blob().then((blob) => {
+    //     var zip = require('jszip')()
+    //     zip.loadAsync(blob).then((zip) => {
+    //       Object.keys(zip.files).forEach((filename) => {
+    //         zip.files[filename].async('text').then((fileData) => {
+    //           if (fileData !== "") {
+    //             console.log('downloading firmware')
+    //             firmwareArr.push(fileData)
+    //           }
+    //         })
+    //       })
+    //     })
+    //   })
+    // })
+    let response = await fetch(selectedFirmware)
+    let blob = await response.blob()
+    var zip = require('jszip')()
+    zip = await zip.loadAsync(blob)
+    for (let filename in zip.files) {
+      //console.log(zip.files[filename].async('text'))
+      firmwareArr.push(zip.files[filename].async('text'))
+    }
   }
 
   const portScan = async () => {
@@ -59,23 +69,36 @@ function App() {
   }
   
   const updateOrbit = async () => {
-    if (selectedFirmware !== null && connected) {
+    if ((selectedFirmware !== null && selectedFirmware !== 'invalid') && connected) {
       downloadFirmware().then(() => {
-        console.log('beginning flash process')
+        console.log('download and extraction complete')
+        Promise.all(firmwareArr).then((data) => {
+          let parsedFirmware = []
+          for (let element in data) {
+            if (data[element] !== '') {
+              parsedFirmware.push(data[element])
+            }
+          }
 
-        let fileArr = []
-        const BOOTLOADER_OFFSET = 0x1000
-        const PARTITIONS_OFFSET = 0x8000
-        const APP_OFFSET = 0xe000
-        const FIRMWARE_OFFSET = 0x10000
+          firmwareArr = parsedFirmware
 
-        fileArr.push({data: firmwareArr[1], address:BOOTLOADER_OFFSET})
-        fileArr.push({data: firmwareArr[3], address: PARTITIONS_OFFSET})
-        fileArr.push({data: firmwareArr[0], address: APP_OFFSET})
-        fileArr.push({data: firmwareArr[2], address: FIRMWARE_OFFSET})
+          console.log('beginning flash process')
 
-        esploader.write_flash({fileArray: fileArr, flash_size: 'keep'})
+          let fileArr = []
+          const BOOTLOADER_OFFSET = 0x1000
+          const PARTITIONS_OFFSET = 0x8000
+          const APP_OFFSET = 0xe000
+          const FIRMWARE_OFFSET = 0x10000
+  
+          fileArr.push({data: firmwareArr[1], address:BOOTLOADER_OFFSET})
+          fileArr.push({data: firmwareArr[3], address: PARTITIONS_OFFSET})
+          fileArr.push({data: firmwareArr[0], address: APP_OFFSET})
+          fileArr.push({data: firmwareArr[2], address: FIRMWARE_OFFSET})
+  
+          esploader.write_flash({fileArray: fileArr, flash_size: 'keep'})
+        })
       })
+        
     } else if (!connected) {
       alert('Please connect to the Orbit!')
     } else {
@@ -97,7 +120,7 @@ function App() {
         <div className='selector'>
           <Selector firmwareList={firmwareList} onChange={handleChange}/>
           <div className='buttonContainer'>
-            <button className='button' onClick={portScan}>Refresh</button>
+            <button className='button' onClick={portScan}>Connect</button>
             <button className='button' onClick={updateOrbit}>Update</button>
           </div>
         </div>
