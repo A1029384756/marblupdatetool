@@ -1,4 +1,6 @@
 import './App.css'
+import marblImg from './img/MARBL.png'
+import axiboImg from './img/AXIBO.png'
 import Selector from './UpdateSelector/selector'
 import { useState } from 'react'
 import { useEffect } from 'react'
@@ -116,13 +118,15 @@ function App() {
 
   return (
     <>
-      <div className='background'>
+      <div className='background'>        
         <div className='selector'>
+          <img className='marbl' src={marblImg}/>
           <Selector firmwareList={firmwareList} onChange={handleChange}/>
           <div className='buttonContainer'>
             <button className='button' onClick={portScan}>Connect</button>
             <button className='button' onClick={updateOrbit}>Update</button>
           </div>
+          <img className='axibo' src={axiboImg}/>
         </div>
       </div>
     </>

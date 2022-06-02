@@ -1,15 +1,30 @@
-.background{
-  background-image: url('./img/bg.png');
-  background-size: contain;
-  background-repeat: no-repeat;
-  display: flex;
-  height: 100vh;
+@media (min-aspect-ratio: 1/1) {
+  html{
+    background-image: url('./img/ORBIT.png');
+    background-size: contain;
+    background-position-x: -5px;
+    background-position-y: 5px;
+    background-repeat: no-repeat;
+    /* display: flex; */
+    height: 99vh;
+    overflow: hidden;
+  }
+}
+
+.marbl {
+  padding: 32px;
+
+}
+
+.axibo {
+  padding: 32px;
 }
 
 .selector{
   display: flex;
   align-items: center;
   width: 100vw;
+  height: 80vh;
   flex-direction: column;
   padding: 1rem;
 }
