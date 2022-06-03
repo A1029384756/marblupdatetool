@@ -25,27 +25,11 @@ function App() {
 
   const downloadFirmware = async () => {
     firmwareArr = []
-    // fetch(selectedFirmware).then((response) => {
-    //   response.blob().then((blob) => {
-    //     var zip = require('jszip')()
-    //     zip.loadAsync(blob).then((zip) => {
-    //       Object.keys(zip.files).forEach((filename) => {
-    //         zip.files[filename].async('text').then((fileData) => {
-    //           if (fileData !== "") {
-    //             console.log('downloading firmware')
-    //             firmwareArr.push(fileData)
-    //           }
-    //         })
-    //       })
-    //     })
-    //   })
-    // })
     let response = await fetch(selectedFirmware)
     let blob = await response.blob()
     var zip = require('jszip')()
     zip = await zip.loadAsync(blob)
     for (let filename in zip.files) {
-      //console.log(zip.files[filename].async('text'))
       firmwareArr.push(zip.files[filename].async('text'))
     }
   }
@@ -53,7 +37,7 @@ function App() {
   const portScan = async () => {
     if (device === null) {
       device = await navigator.serial.requestPort({
-        filters: [{usbVendorId: 0x10c4}]
+        filters: [{usbVendorId: 0x1a86}]
       })
       transport = new Transport(device)
       console.log(transport)
