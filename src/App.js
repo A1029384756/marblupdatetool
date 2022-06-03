@@ -37,7 +37,7 @@ function App() {
   const portScan = async () => {
     if (device === null) {
       device = await navigator.serial.requestPort({
-        filters: [{usbVendorId: 0x1a86}]
+        // filters: [{usbVendorId: 0x1a86}]
       })
       transport = new Transport(device)
       console.log(transport)
