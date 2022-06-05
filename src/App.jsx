@@ -38,8 +38,6 @@ function App() {
   }
 
   const portScan = async () => {
-    updateScanCSS('button is-info is-loading')
-
     if (espStub) {
       await espStub.disconnect()
       await espStub.port.close()
@@ -56,6 +54,7 @@ function App() {
     })
 
     try {
+      updateScanCSS('button is-info is-loading')
       await esploader.initialize()
 
       console.log("Connected to " + esploader.chipName)
@@ -99,7 +98,7 @@ function App() {
             return await blob.arrayBuffer()
           }
 
-          for (var i = 0; i < 4; i++) {
+          for (let i = 0; i < 4; i++) {
             firmwareArr[i] = await blobToArrayBuffer(firmwareArr[i])
           }
   
@@ -108,7 +107,7 @@ function App() {
           fileArr.push({data: firmwareArr[0], address: APP_OFFSET})
           fileArr.push({data: firmwareArr[2], address: FIRMWARE_OFFSET})
           
-          for (var i = 0; i < 4; i++) {
+          for (let i = 0; i < 4; i++) {
             updateFileCount(i + 1)
             updatePercent('0')
             try {
@@ -158,14 +157,14 @@ function App() {
     <>
       <div className='background'>        
         <div className='selector'>
-          <img className='marbl' src={marblImg}/>
+          <img className='marbl' src={marblImg} alt='Marbl Orbit'/>
           <Selector firmwareList={firmwareList} onChange={handleChange}/>
           <div className='buttonContainer'>
             <button className={scanCSS} onClick={portScan}>{connected ? "Connected" : "Connect"}</button>
             <button className={updateCSS} onClick={updateOrbit} disabled={updating}>{updating ? "Updating" : "Update"}</button>
           </div>
           <ProgressBar updating={updating} completion={percent} fileCount={fileCount}></ProgressBar>
-          <img className='axibo' src={axiboImg}/>
+          <img className='axibo' src={axiboImg} alt='Powered by Axibo'/>
         </div>
       </div>
     </>

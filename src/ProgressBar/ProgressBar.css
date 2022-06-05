@@ -17,3 +17,29 @@
         transition-duration: 0.2s;
     }
 }
+
+.progress {
+    transition-duration: 0.2s;
+}
+
+.progress::-webkit-progress-value {
+    transition: width 0.4s ease;
+}
+
+.showProgress-enter {
+    opacity: 0;
+}
+
+.showProgress-enter-active {
+    opacity: 1;
+    transition: opacity 200ms;
+}
+
+.showProgress-exit {
+    opacity: 1;
+}
+
+.showProgress-exit-active {
+    opacity: 0;
+    transition: opacity 200ms;
+}
