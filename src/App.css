@@ -1,4 +1,4 @@
-@media (min-aspect-ratio: 1/1) {
+@media (min-aspect-ratio: 9/8) {
   html{
     background-image: url('./img/ORBIT.png');
     background-size: contain;
@@ -33,25 +33,6 @@
   margin: 1rem;
 }
 
-.button{
+.button {
   margin: 3px;
-  background-color: #0984e3;
-  color: #dfe6e9;
-  border: 0;
-  border-radius: 4px;
-  text-align: center;
-  font-size: 16px;
-  padding: 10px;
-  transition-duration: 0.4s;
-}
-
-.button:hover{
-  background-color: #dfe6e9;
-  color: #0984e3;
-  transition-duration: 0.4s;
-}
-
-.button:active{
-  background-color: #aeb5b8;
-  transition-duration: 0.2s;
 }

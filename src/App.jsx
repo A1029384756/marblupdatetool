@@ -2,6 +2,7 @@ import './App.css'
 import marblImg from './img/MARBL.png'
 import axiboImg from './img/AXIBO.png'
 import Selector from './UpdateSelector/selector'
+import ProgressBar from './ProgressBar/ProgressBar'
 import { useState } from 'react'
 import { useEffect } from 'react'
 import { queryDatabase } from './utils/firebase'
@@ -9,10 +10,6 @@ import { connect } from './utils/esptools/index'
 import { sleep } from './utils/esptools/util'
 
 let espStub
-const baudRate = 115200
-const bufferSize = 512
-const measurementPeriodId = '0001'
-
 let firmwareArr = []
 
 function App() {
@@ -20,6 +17,10 @@ function App() {
   const [selectedFirmware, updateSelectedFirmware] = useState(null)
   const [connected, toggleConnected] = useState(false)
   const [updating, toggleUpdating] = useState(false)
+  const [fileCount, updateFileCount] = useState(0)
+  const [percent, updatePercent] = useState('0')
+  const [scanCSS, updateScanCSS] = useState('button is-info')
+  const [updateCSS, updateUpdateCSS] = useState('button is-success')
 
   const handleChange = (newSelection) => {
     updateSelectedFirmware(newSelection)
@@ -37,12 +38,14 @@ function App() {
   }
 
   const portScan = async () => {
+    updateScanCSS('button is-info is-loading')
 
     if (espStub) {
       await espStub.disconnect()
       await espStub.port.close()
       espStub = undefined
       toggleConnected(!connected)
+      updateScanCSS('button is-info')
       return
     }
 
@@ -59,15 +62,19 @@ function App() {
       
       espStub = await esploader.runStub()
       toggleConnected(!connected)
+      updateScanCSS('button is-info')
     } catch (err) {
       await esploader.disconnect()
+      updateScanCSS('button is-info is-danger')
+      alert('Error connecting to Orbit')
       throw err
     }
   }
   
   const updateOrbit = async () => {
-    if ((selectedFirmware !== null && selectedFirmware !== 'invalid') && connected) {
+    if ((selectedFirmware !== null && selectedFirmware !== 'invalid') && connected && espStub) {
       toggleUpdating(!updating)
+      updateUpdateCSS('button is-success is-loading')
       downloadFirmware().then(() => {
         console.log('download and extraction complete')
         Promise.all(firmwareArr).then(async (data) => {
@@ -94,22 +101,22 @@ function App() {
 
           for (var i = 0; i < 4; i++) {
             firmwareArr[i] = await blobToArrayBuffer(firmwareArr[i])
-            console.log(firmwareArr[i])
           }
   
           fileArr.push({data: firmwareArr[1], address:BOOTLOADER_OFFSET})
           fileArr.push({data: firmwareArr[3], address: PARTITIONS_OFFSET})
           fileArr.push({data: firmwareArr[0], address: APP_OFFSET})
           fileArr.push({data: firmwareArr[2], address: FIRMWARE_OFFSET})
-
-          console.log(fileArr)
           
           for (var i = 0; i < 4; i++) {
+            updateFileCount(i + 1)
+            updatePercent('0')
             try {
               await espStub.flashData(
                 fileArr[i].data,
                 (bytesWritten, totalBytes) => {
-                  console.log(100*bytesWritten/totalBytes)
+                  var progress = 100*bytesWritten/totalBytes
+                  updatePercent(progress.toString())
                 },
                 fileArr[i].address
               )
@@ -117,10 +124,17 @@ function App() {
             } catch (err) {
               console.error(err)
               toggleUpdating(!updating)
+              updateUpdateCSS('button is-danger')
             }
           }
+          await espStub.disconnect()
+          await espStub.port.close()
+          espStub = undefined
+          toggleConnected(!connected)
+          
           console.log('Finished')
           toggleUpdating(false)
+          updateUpdateCSS('button is-success')
         })
       })
 
@@ -147,9 +161,10 @@ function App() {
           <img className='marbl' src={marblImg}/>
           <Selector firmwareList={firmwareList} onChange={handleChange}/>
           <div className='buttonContainer'>
-            <button className='button' onClick={portScan}>{connected ? "Connected" : "Connect"}</button>
-            <button className='button' onClick={updateOrbit} disabled={updating}>{updating ? "Updating" : "Update"}</button>
+            <button className={scanCSS} onClick={portScan}>{connected ? "Connected" : "Connect"}</button>
+            <button className={updateCSS} onClick={updateOrbit} disabled={updating}>{updating ? "Updating" : "Update"}</button>
           </div>
+          <ProgressBar updating={updating} completion={percent} fileCount={fileCount}></ProgressBar>
           <img className='axibo' src={axiboImg}/>
         </div>
       </div>
