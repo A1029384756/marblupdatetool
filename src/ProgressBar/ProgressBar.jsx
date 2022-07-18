@@ -6,7 +6,7 @@ function ProgressBar(props) {
         <motion.div animate={{ scaleY: props.updating ? 1 : 0}}>
             <div className='box progressContainer'>
                 <progress className="progress is-info" value={props.completion} max="100"></progress>
-                <div className='labelTxt'>File {props.fileCount} of 4</div>
+                <div className='labelTxt'>File {props.fileCount} of {props.totalFiles}</div>
             </div>
         </motion.div>
     )

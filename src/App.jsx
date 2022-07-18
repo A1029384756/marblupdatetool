@@ -18,6 +18,7 @@ function App() {
   const [connected, toggleConnected] = useState(false)
   const [updating, toggleUpdating] = useState(false)
   const [fileCount, updateFileCount] = useState(0)
+  const [totalFiles, updateTotalFiles] = useState(0)
   const [percent, updatePercent] = useState('0')
   const [scanCSS, updateScanCSS] = useState('button is-info')
   const [updateCSS, updateUpdateCSS] = useState('button is-success')
@@ -98,16 +99,22 @@ function App() {
             return await blob.arrayBuffer()
           }
 
-          for (let i = 0; i < 4; i++) {
+          updateTotalFiles(firmwareArr.length)
+
+          for (let i = 0; i < firmwareArr.length; i++) {
             firmwareArr[i] = await blobToArrayBuffer(firmwareArr[i])
           }
-  
-          fileArr.push({data: firmwareArr[1], address:BOOTLOADER_OFFSET})
-          fileArr.push({data: firmwareArr[3], address: PARTITIONS_OFFSET})
-          fileArr.push({data: firmwareArr[0], address: APP_OFFSET})
-          fileArr.push({data: firmwareArr[2], address: FIRMWARE_OFFSET})
+
+          if (firmwareArr.length === 1) {
+            fileArr.push( {data: firmwareArr[0], address: 0x000000})
+          } else if (firmwareArr.length === 4) {
+            fileArr.push({data: firmwareArr[1], address:BOOTLOADER_OFFSET})
+            fileArr.push({data: firmwareArr[3], address: PARTITIONS_OFFSET})
+            fileArr.push({data: firmwareArr[0], address: APP_OFFSET})
+            fileArr.push({data: firmwareArr[2], address: FIRMWARE_OFFSET})
+          }
           
-          for (let i = 0; i < 4; i++) {
+          for (let i = 0; i < firmwareArr.length; i++) {
             updateFileCount(i + 1)
             updatePercent('0')
             try {
@@ -163,7 +170,7 @@ function App() {
             <button className={scanCSS} onClick={portScan}>{connected ? "Connected" : "Connect"}</button>
             <button className={updateCSS} onClick={updateOrbit} disabled={updating}>{updating ? "Updating" : "Update"}</button>
           </div>
-          <ProgressBar updating={updating} completion={percent} fileCount={fileCount}></ProgressBar>
+          <ProgressBar updating={updating} completion={percent} fileCount={fileCount} totalFiles={totalFiles}></ProgressBar>
           <img className='axibo' src={axiboImg} alt='Powered by Axibo'/>
         </div>
       </div>
