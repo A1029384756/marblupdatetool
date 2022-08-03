@@ -18,7 +18,7 @@ const firmwareRef = collection(db, 'firmware_links')
 export const queryDatabase = async () => {
   var dataArr = []
 
-  const q = query(firmwareRef, orderBy('release_time', 'desc'), limit(5))
+  const q = query(firmwareRef, orderBy('release_time', 'desc'), limit(6))
   const querySnapshot = await(getDocs(q))
 
   for (var i = 0; i < querySnapshot.docs.length; i++) {
